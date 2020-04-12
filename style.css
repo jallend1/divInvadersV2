@@ -14,11 +14,11 @@ h1{
 .cell{
     width: 20px;
     height: 20px;
-    background-color: red;
 }
 
 .enemy{
     background-color: green;
+    border-radius: 50%;
 }
 
 .player{
