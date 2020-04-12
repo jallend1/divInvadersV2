@@ -6,9 +6,19 @@ const deadLasers = [];
 let playerLocation = 202;
 let direction = 1;
 let score = 0;
+const deadBaddies = [];
 const baddies = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                 30, 31, 32, 33, 34, 35, 36, 37, 38, 39];
+
+function checkGameOver(){
+    baddies.forEach(baddie => {                                                     // If aliens reach player's row, game over
+        if(baddie / gameSize > gameSize - 2){
+            console.log('Aliens reached ya!');
+            clearInterval(gamePlay)
+        }
+    })
+}
 
 function handleLasers(){
     cells.forEach(cell => cell.classList.remove('laser'));                          //Removes all existing lasers before updating
@@ -16,7 +26,9 @@ function handleLasers(){
         for(let i = 0; i < lasers.length; i++){                                     //Moves every laser to its new position
             lasers[i] -= gameSize;                                      
         }
-        lasers.forEach((laser, index) => laser < 0 ? deadLasers.push(index) : cells[laser].classList.add('laser')); //Renders lasers and saves off-grid lasers for removal
+        lasers.forEach((laser, index) => laser < 0                                  //Renders lasers and saves off-grid lasers for removal
+            ? deadLasers.push(index) 
+            : cells[laser].classList.add('laser')); 
         deadLasers.forEach(dead => {                                                
             lasers.splice(dead, 1);                                                 //Removes every laser that's traveled off-screen from the array
             deadLasers.shift();                                                     //Clears removed lasers from to-remove array
@@ -32,18 +44,27 @@ function generateBaddies(){
             baddies[i] += gameSize; 
         }
     }
-    else if((baddies[baddies.length - 1] + 1) % 15 === 0 && direction === 1){
+    else if((baddies[baddies.length - 1] + 1) % 15 === 0 && direction === 1){   // If aliens hit the right, move down a row and reverse direction
         direction = -1;
         for(let i = 0; i < baddies.length; i++){
             baddies[i] += gameSize;
         }
     }
-    baddies.forEach(baddie => {
-        cells[baddie].classList.add('enemy');
-    });
-                for(let i = 0; i < baddies.length; i++){
-                    baddies[i] += direction;
-                }
+    else{                                                                       // Move the alien 
+        for(let i = 0; i < baddies.length; i++){
+            baddies[i] += direction;
+        }
+    }
+        checkGameOver();
+        baddies.forEach((baddie, index) => {
+            if(cells[baddie].classList.contains('laser')){
+                cells[baddie].classList.add('boom');
+                deadBaddies.push(index)
+            }
+            else{
+                cells[baddie].classList.add('enemy');
+            }
+        });
 }
 
 function generateBoard(){
